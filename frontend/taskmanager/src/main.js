@@ -1,3 +1,4 @@
+
 import Vue from 'vue'
 import App from './App.vue'
 
@@ -29,6 +30,7 @@ Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
 Vue.config.productionTip = false
 export const bus = new Vue();
+
 new Vue({
   vuetify,
   render: h => h(App)

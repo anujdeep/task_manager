@@ -52,11 +52,12 @@
        v-if="myToggle">
       Submit</b-button>
 
-      <b-modal ref="my-modal" id="modal-center" centered hide-footer title="Successfully registered" >
-          <div class="my-4" text-align="center"><p v-if="errVal">Input is blank </p>
-          <p v-else>{{form.empId   }} {{form.name}} </p></div>
+      <b-modal ref="my-modal" id="modal-center" centered hide-footer title="Results" >
+          <div class="my-4" text-align="center"><p v-if="errVal">Invalid inputs! Please check</p>
+          <p v-else>{{form.name}} {{form.empId}}</p></div>
           <b-button class="mt-3" variant="outline-danger" id="modcol" block @click="hideModal();onReset();">Close Me</b-button>
       </b-modal>
+
 
       <b-button type="reset" variant="danger" v-if="form.view">Reset</b-button>
       </div>
@@ -75,6 +76,9 @@
 
                   <!--<unicon name="edit" fill="#333" :width="15" :height="15" />-->
                 </li>
+				<b-modal ref="errorwork" id="my-modal1" centered hide-footer><div>Error Occured! try Again</div>
+				<b-button class="mt-3" variant="outline-danger" id="modcol" block @click="hideModal1()">Close Me</b-button>
+				</b-modal>
             </ul>
             <ul v-else>None</ul>
             <p id="detail-1">Projects completed:</p>
@@ -125,7 +129,9 @@
 <script>
 import axios from 'axios'
 import { bus } from '../main'
+
 const BASE_URL = 'http://localhost:3000';
+
   export default {
     data() {
       return {
@@ -158,24 +164,22 @@ const BASE_URL = 'http://localhost:3000';
           var val=this.uncompletedTask.splice(this.uncompletedTask.findIndex(function(i){
               return i.project ==pro;
           }), 1);
-          for(var i=0;i<this.completedTask.length;i++){
-              console.log(this.completedTask[i]);
-          }
+
           this.completedTask.push({project:val[0].project});
-          console.log(val[0].project);
-        axios.post(`${BASE_URL}/finish/${id}/${pro}`)
+          
+        axios.post(`${BASE_URL}/api/finish/${id}/${pro}`)
         .then(res=>{
-          console.log(res);
+          console.log(res.data)
           this.getEmployee();
         })
-        .catch(err=>{
+        .catch(err=>{this.$refs['errorwork'].show()
           console.log(err);
         })
       },
       getEmployee(){
         var x='sort';
         var y='desk_pos';
-        axios.get(`${BASE_URL}/${x}/${y}`)
+        axios.get(`${BASE_URL}/api/${x}/${y}`)
           .then(response => {
             this.employee_list=response.data
             bus.$emit('changeIt', this.employee_list);
@@ -187,7 +191,7 @@ const BASE_URL = 'http://localhost:3000';
       },
       assignWork(){
         if(this.form.work!=''){
-            axios.post(`${BASE_URL}/insert`,this.form)
+            axios.post(`${BASE_URL}/api/insert`,this.form)
             .then(res=>{
               this.getEmployee();
               console.log(res);
@@ -200,7 +204,7 @@ const BASE_URL = 'http://localhost:3000';
       deleteEmployee(){
         this.$confirm("Are you sure?").then(() => {
           var x=parseInt(this.form.empId);
-          axios.delete(`${BASE_URL}/del/${x}`)
+          axios.delete(`${BASE_URL}/api/del/${x}`)
             .then((res) => {
               this.getEmployee();
               // this.form.formerEmployee=res.data
@@ -215,13 +219,13 @@ const BASE_URL = 'http://localhost:3000';
       },
       edit(){
         this.form.newWork=true
-        console.log(this.form.newWork)
+        
       },
       former(){
         var x=parseInt(this.form.empId);
         this.validated=1;
         //console.log(x+" sun");
-        axios.get(`${BASE_URL}/search/${'empId'}/${x}`)
+        axios.get(`${BASE_URL}/api/search/${'empId'}/${x}`)
           .then((res) => {
             this.form.formerEmployee=res.data
             this.completedTask=this.form.formerEmployee[0].work.filter((val)=>{
@@ -257,21 +261,21 @@ const BASE_URL = 'http://localhost:3000';
         document.getElementById('input-4').focus()
       },
       nextshow4(){
-        if(this.form.name=="" || this.form.deskpos=="" || this.form.work=="" ){
-            this.errVal=true
-            console.log("error occured");
-        }
-        console.log(this.errVal);
+        
+        
         document.getElementById('sub1').focus()
 
       },
       showModal() {
+      
+      
         this.$refs['my-modal'].show()
       },
       hideModal() {
+        this.errVal=false
         this.$refs['my-modal'].hide()
         this.getEmployee();
-      },
+      },hideModal1(){this.$refs['errorwork'].hide()},
       changeToggle(){
         this.myToggle=true
         //this.nextshow4();
@@ -288,17 +292,18 @@ const BASE_URL = 'http://localhost:3000';
       },
       onSubmit(evt) {
         evt.preventDefault()
-        this.showModal();
-        if(this.form.name!="" && this.form.deskpos!="" && this.form.work!="" ){
+        
+        if((this.form.name!="" && this.form.deskpos!="" && this.form.work!="" && typeof(this.form.name)=='string' && 
+		isNaN(this.form.name) && typeof(Number(this.form.deskpos))=='number')){
           let newEmployee={
             empId:this.form.empId,
             name:this.form.name.toUpperCase(),
             deskpos:this.form.deskpos,
             work:this.form.work,
-          }
+          };this.errVal=false;
 
           console.log(newEmployee);
-          axios.post(`${BASE_URL}/insert`,newEmployee)
+          axios.post(`${BASE_URL}/api/insert`,newEmployee)
           .then(res=>{
             console.log(res);
             this.getEmployee();
@@ -308,6 +313,11 @@ const BASE_URL = 'http://localhost:3000';
           })
 
         }
+        else{
+          this.errVal=true;
+        }
+		
+		this.showModal();
       },
       onReset() {
         //evt.preventDefault()
@@ -330,7 +340,7 @@ const BASE_URL = 'http://localhost:3000';
         })
       }
     },
-    
+
   }
 </script>
 

@@ -15,7 +15,9 @@
           <b-dropdown-item-button  @click="inprog">Inprogress Projects</b-dropdown-item-button>
           <b-dropdown-item-button @click="compl" >Completed Projects</b-dropdown-item-button>
           <b-dropdown-item-button  @click="getEmployee" >No Filter</b-dropdown-item-button>
-      </b-dropdown>
+      </b-dropdown><b-modal ref="errorwork" id="my-modal1" centered hide-footer><div>Error Occured! try Again</div>
+				<b-button class="mt-3" variant="outline-danger" id="modcol" block @click="hideModal1()">Close Me</b-button>
+				</b-modal>
         <v-spacer></v-spacer>
 
         <b-button @click="getproavg"  variant="outline-dark" size="sm" v-b-modal.modal-cent >Statistics</b-button>
@@ -118,14 +120,13 @@ const BASE_URL = 'http://localhost:3000';
         this.$refs['my-modal'].hide()
       },
       getproavg(){
-        axios.get(`${BASE_URL}/time1`)
+        axios.get(`${BASE_URL}/api/time1`)
           .then(response => {
             this.proavg=response.data
 
-            //bus.$emit('showgh',this.proavg[0]._id)
-            console.log(this.proavg);
+            
           })
-          .catch(error => {
+          .catch(error => {this.$refs['my-modal'].show()
             console.log(error)
 
           })
@@ -135,7 +136,7 @@ const BASE_URL = 'http://localhost:3000';
 
       finishTask(pro,id){
 
-        axios.post(`${BASE_URL}/finish/${id}/${pro}`)
+        axios.post(`${BASE_URL}/api/finish/${id}/${pro}`)
         .then(res=>{
           this.change=1
           this.getEmployee();
@@ -177,7 +178,7 @@ const BASE_URL = 'http://localhost:3000';
         this.droptitle='filter'
         var x='sort';
         var y='desk_pos';
-         axios.get(`${BASE_URL}/${x}/${y}`)
+         axios.get(`${BASE_URL}/api/${x}/${y}`)
           .then(response => {
             this.employee_list=response.data
             this.original_list=response.data
@@ -185,16 +186,17 @@ const BASE_URL = 'http://localhost:3000';
             bus.$emit('changeIt', this.original_list);
           })
           .catch(error => {
+			this.$refs['errorwork'].show()
             console.log(error)
 
           })
-      },
+      },hideModal1(){this.$refs['errorwork'].hide()}
     },
     mounted() {
       this.droptitle='filter'
       var x='sort';
       var y='desk_pos';
-          axios.get(`${BASE_URL}/${x}/${y}`)
+          axios.get(`${BASE_URL}/api/${x}/${y}`)
             .then(response => {
               this.employee_list=response.data
               this.original_list=response.data
@@ -203,8 +205,8 @@ const BASE_URL = 'http://localhost:3000';
               console.log(error)
 
             })
-            axios.get(`${BASE_URL}/time`)
-              
+            axios.get(`${BASE_URL}/api/time`)
+
               .catch(error => {
                 console.log(error)
 
@@ -221,10 +223,10 @@ const BASE_URL = 'http://localhost:3000';
             this.change=0;
             this.inprog();
           }
-          axios.get(`${BASE_URL}/time`)
-            .then(response => {
-                console.log(response.data);
-            })
+          axios.get(`${BASE_URL}/api/time`)
+            /*.then(response => {
+                //console.log(response.data);
+            })*/
             .catch(error => {
               console.log(error)
 

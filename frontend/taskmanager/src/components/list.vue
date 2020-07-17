@@ -66,7 +66,7 @@ const BASE_URL = 'http://localhost:3000';
       //console.log(this.change+" mounted")
       var x='sort';
       var y='desk_pos';
-          axios.get(`${BASE_URL}/${x}/${y}`)
+          axios.get(`${BASE_URL}/api/${x}/${y}`)
             .then(response => {
               this.employee_list=response.data
 
