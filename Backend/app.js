@@ -7,11 +7,14 @@ var mongoose=require('mongoose');
 var indexRouter = require('./routes/index');
 
 var bodyParser = require('body-parser'); // for converting data to json format
+
 let model = require('./models/employee')
 
+var logger = require('morgan')
+  
 var app = express();
 
-
+app.use(logger('dev'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
