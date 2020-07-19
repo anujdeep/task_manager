@@ -3,7 +3,7 @@ import { Line } from 'vue-chartjs'
 import axios from 'axios'
 import { bus } from '../main'
 
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = process.env.VUE_APP_BASE_URL
 export default {
   extends: Line,
   //props: ['data'],

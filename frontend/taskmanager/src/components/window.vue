@@ -130,8 +130,7 @@
 import axios from 'axios'
 import { bus } from '../main'
 
-const BASE_URL = 'http://localhost:3000';
-
+const BASE_URL = process.env.VUE_APP_BASE_URL
   export default {
     data() {
       return {
@@ -224,7 +223,7 @@ const BASE_URL = 'http://localhost:3000';
       former(){
         var x=parseInt(this.form.empId);
         this.validated=1;
-        //console.log(x+" sun");
+        console.log(BASE_URL);
         axios.get(`${BASE_URL}/api/search/${'empId'}/${x}`)
           .then((res) => {
             this.form.formerEmployee=res.data

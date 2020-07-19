@@ -67,7 +67,7 @@
 import { bus } from '../main'
 import axios from 'axios'
 import char from './chart.vue'
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = process.env.VUE_APP_BASE_URL
   export default {
     data () {
       return {

@@ -34,7 +34,7 @@
 <script>
 import { bus } from '../main'
 import axios from 'axios'
-const BASE_URL = 'http://localhost:3000';
+const BASE_URL = process.env.VUE_APP_BASE_URL
   export default{
     // props:{
     //   change:Boolean
@@ -75,6 +75,8 @@ const BASE_URL = 'http://localhost:3000';
               console.log(error)
 
             })
+			var w=process.env.VUE_APP_BASE_URL
+			console.log(BASE_URL+" "+w+" "+BASE_URL)
 
     },
     created (){
