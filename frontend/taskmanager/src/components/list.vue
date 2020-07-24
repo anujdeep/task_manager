@@ -36,21 +36,17 @@ import { bus } from '../main'
 import axios from 'axios'
 const BASE_URL = process.env.VUE_APP_BASE_URL
   export default{
-    // props:{
-    //   change:Boolean
-    // },
+    
     data(){
         return{
-          // free_list:[],
-          // busy_list:[]
+          
           employee_list:[]
         }
     },
     computed: {
     // a computed getter
       free_list: function () {
-        //console.log(this.change+" computed");
-        // `this` points to the vm instance
+        
         return this.employee_list.filter(function (num) {
                       return num.status==true;})
       },
@@ -62,8 +58,7 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
 
     mounted() {
     // a computed getter
-      //this.change=false
-      //console.log(this.change+" mounted")
+      
       var x='sort';
       var y='desk_pos';
           axios.get(`${BASE_URL}/api/${x}/${y}`)
@@ -75,8 +70,7 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
               console.log(error)
 
             })
-			var w=process.env.VUE_APP_BASE_URL
-			console.log(BASE_URL+" "+w+" "+BASE_URL)
+			
 
     },
     created (){

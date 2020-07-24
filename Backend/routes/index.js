@@ -11,39 +11,36 @@ router.get('/products/:id', function (req, res, next) {
   res.json({msg: 'This is CORS-enabled for all origins!'})
 })
 
+const valschema = require('./valschema'); 
+const joiware = require('./joiware'); 
 
-router.post('/api/insert',async (req,res)=>{
+router.post('/insert',joiware(valschema.Employee), async (req,res)=>{
 
-      
+    
   let dataAll=req.body;
   try{
 
     let data=new model({empId:dataAll.empId,name:dataAll.name,desk_pos:dataAll.deskpos,work:{project:dataAll.work},
     status:false});
-    if(await model.exists({empId:data.empId})){
-      await model.updateOne({ empId:data.empId }, {$push: {work:{project:dataAll.work}}});
-      await model.updateOne({ empId:data.empId }, {status:false});
-      res.send("Hello,you have inserted your data");
-      console.log("data inserted in array");
-    }
-    else{
-        await data.save((err)=>{
-          if(err){
-            console.log(err+" occured");
-          }else{
-            res.send("Hello,you have inserted your data");
-              console.log("Document Save Done");
-          }
-        });
-    }
+    
+	await data.save((err)=>{
+	  if(err){
+		console.log(err+" occured");
+	  }else{
+		res.send("Hello,you have inserted your data");
+		  console.log("Document Save Done");
+	  }
+	});
+    
   }
   catch(err){
+	  console.log(err);
     res.send("error occured"+err);
     
   }
 });
 
-router.get('/api/show',async (req,res)=>{
+router.get('/show',async (req,res)=>{
   try{
     let data=await model.find();
     res.json(data);
@@ -55,9 +52,28 @@ router.get('/api/show',async (req,res)=>{
   }
 });
 
+router.put('/insertwork', async (req,res)=>{
+
+    
+  let dataAll=req.body;
+  try{
+
+	  await model.updateOne({ empId:dataAll.empId }, {$push: {work:{project:dataAll.work}}});
+	  await model.updateOne({ empId:dataAll.empId }, {status:false});
+	  res.send("Hello,you have inserted your data");
+	  console.log("data inserted in array");
+    
+    
+  }
+  catch(err){
+	  console.log(err);
+    res.send("error occured"+err);
+    
+  }
+});
 
 
-router.delete('/api/del/:val',async (req,res)=>{
+router.delete('/del/:val',async (req,res)=>{
   let param=req.params.val;
   console.log(param);
   try{
@@ -71,7 +87,7 @@ router.delete('/api/del/:val',async (req,res)=>{
   }
 });
 
-router.get('/api/sort/:val',async (req,res)=>{
+router.get('/sort/:val',async (req,res)=>{
 
   var param = req.params.val;
 
@@ -95,22 +111,32 @@ router.get('/api/sort/:val',async (req,res)=>{
     console.log(err);
   }
 });
-router.get('/api/search/:type/:val',async (req,res)=>{
+router.get('/search/:type/:val',async (req,res)=>{
 
   var param = req.params.type;
   var value=req.params.val;
-
-
+	
+	
   try{
     if(param=='name'){
 
         let result=await model.find({ $text: { $search: value  } });
         res.json(result);
     }
-    else if(param=='empId'){
-      let result=await model.find({empId:value});
+    else if(param=='empId' ){
+		if(isNaN(value)==false){
+			let result=await model.find({empId:value});
 
-      res.json(result);
+			res.json(result);
+		}
+		else{
+			
+			return res.status(400).send({
+				error: 'EmpId should be a number'
+			});
+			
+		}
+		
     }
     else if(param=='desk_pos'){
       let result=await model.find({desk_pos:value});
@@ -130,7 +156,7 @@ router.get('/api/search/:type/:val',async (req,res)=>{
 
 
 
-router.post('/api/finish/:empId/:work',async (req,res)=>{
+router.put('/finish/:empId/:work',async (req,res)=>{
   let val=req.params.empId;
   let cal=req.params.work;
 
@@ -145,7 +171,7 @@ router.post('/api/finish/:empId/:work',async (req,res)=>{
                                             {$set: {"status" : false}});
 
     res.send(temp);
-    console.log(temp+" updated successfully "+ updateStatus  );
+    console.log("data updated successfully");
   }
   catch(err){
 	  res.send("error occured"+err);
@@ -154,7 +180,7 @@ router.post('/api/finish/:empId/:work',async (req,res)=>{
 });
 
 
-router.get('/api/time1',async (req,res)=>{
+router.get('/time1',async (req,res)=>{
   try{
 
        let result=await model.aggregate([
@@ -186,7 +212,7 @@ router.get('/api/time1',async (req,res)=>{
      }
 
 });
-router.get('/api/time',async (req,res)=>{
+router.get('/time',async (req,res)=>{
 
   try{
 
@@ -226,7 +252,7 @@ router.get('/api/time',async (req,res)=>{
        console.log(err);
      }
 });
-router.get('/api/time2/:val',async (req,res)=>{
+router.get('/time2/:val',async (req,res)=>{
   try{
       var x=req.params.val;
        let result=await model.aggregate([

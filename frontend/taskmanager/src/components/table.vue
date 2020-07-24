@@ -105,12 +105,12 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
     },
     methods:{
       showgraph(val){
-        //this.shgraph=1
+        
         bus.$emit('showgh', val);
       },
       clicked(value) {
         this.expanded.push(value)
-        //this.getaverage();
+        
       },
       showModal() {
         this.$refs['my-modal'].show()
@@ -136,12 +136,12 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
 
       finishTask(pro,id){
 
-        axios.post(`${BASE_URL}/api/finish/${id}/${pro}`)
+        axios.put(`${BASE_URL}/api/finish/${id}/${pro}`)
         .then(res=>{
           this.change=1
           this.getEmployee();
-          console.log(res);
-          //this.getEmployee();
+          console.log(res.data);
+          
         })
         .catch(err=>{
           console.log(err);
@@ -150,26 +150,22 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
       inprog(){
         this.filter1=1;
         this.droptitle='Inprogress'
-        //this.getEmployee();
-          //console.log(this.employee_list)
+        
         this.employee_list=this.original_list.filter(function (num) {
                       //return num.work.includes(num.work.complete_time==null)})
                       return num.status==false;
                     })
-        //console.log(this.employee_list)
+        
 
       },
       compl(){
         this.filter1=2;
           this.droptitle='Completed'
-          //this.getEmployee();
+          
           this.employee_list=this.original_list.filter((num)=>{
             return num.work.some(vendor => vendor['complete_time'] != null )
              })//some and every
- //                        return (num.work.filter((val)=>{
- //   return (val.comp!=null)
- // }))})
-          //console.log(this.employee_list)
+ 
 
       },
        getEmployee(){
@@ -224,9 +220,7 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
             this.inprog();
           }
           axios.get(`${BASE_URL}/api/time`)
-            /*.then(response => {
-                //console.log(response.data);
-            })*/
+            
             .catch(error => {
               console.log(error)
 

@@ -20,7 +20,7 @@
           v-model="form.name"
           @keyup.enter="nextshow2()" @keydown.enter="call"
           type="text"
-          required
+          
           placeholder="Enter name"
         ></b-form-input>
       </b-form-group>
@@ -32,7 +32,7 @@
           v-model="form.work"
           @keyup.enter="nextshow3()" @keydown.enter="call"
           type="text"
-          required
+          
         ></b-form-input>
       </b-form-group>
 
@@ -40,8 +40,8 @@
         <b-form-input
           id="input-4" @keyup="changeToggle();"  @keyup.enter="nextshow4();" @keydown.enter="call"
           v-model="form.deskpos"
-          type="number"  min="0"
-          required
+          
+          
         ></b-form-input>
 
       </b-form-group>
@@ -53,7 +53,7 @@
       Submit</b-button>
 
       <b-modal ref="my-modal" id="modal-center" centered hide-footer title="Results" >
-          <div class="my-4" text-align="center"><p v-if="errVal">Invalid inputs! Please check</p>
+          <div class="my-4" text-align="center"><p v-if="errVal">Invalid inputs! Please check<br> {{allerr}}</p>
           <p v-else>{{form.name}} {{form.empId}}</p></div>
           <b-button class="mt-3" variant="outline-danger" id="modcol" block @click="hideModal();onReset();">Close Me</b-button>
       </b-modal>
@@ -153,6 +153,7 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
         val:0,
         myToggle:false,
         errVal:false,
+		allerr:{},
 
         show: true
       }
@@ -166,7 +167,7 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
 
           this.completedTask.push({project:val[0].project});
           
-        axios.post(`${BASE_URL}/api/finish/${id}/${pro}`)
+        axios.put(`${BASE_URL}/api/finish/${id}/${pro}`)
         .then(res=>{
           console.log(res.data)
           this.getEmployee();
@@ -190,15 +191,20 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
       },
       assignWork(){
         if(this.form.work!=''){
-            axios.post(`${BASE_URL}/api/insert`,this.form)
+            axios.put(`${BASE_URL}/api/insertwork`,this.form)
             .then(res=>{
               this.getEmployee();
-              console.log(res);
+              console.log(res.data);
             })
             .catch(err=>{
               console.log(err);
             })
         }
+		else{
+		
+		this.errVal=true;
+		this.allerr="work can't be empty";
+		}
       },
       deleteEmployee(){
         this.$confirm("Are you sure?").then(() => {
@@ -206,8 +212,8 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
           axios.delete(`${BASE_URL}/api/del/${x}`)
             .then((res) => {
               this.getEmployee();
-              // this.form.formerEmployee=res.data
-              console.log(res);
+              
+              console.log(res.data);
             })
             .catch((err) => {
               console.log(err.data);
@@ -221,9 +227,9 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
         
       },
       former(){
-        var x=parseInt(this.form.empId);
+        var x=this.form.empId;
         this.validated=1;
-        console.log(BASE_URL);
+        
         axios.get(`${BASE_URL}/api/search/${'empId'}/${x}`)
           .then((res) => {
             this.form.formerEmployee=res.data
@@ -292,8 +298,7 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
       onSubmit(evt) {
         evt.preventDefault()
         
-        if((this.form.name!="" && this.form.deskpos!="" && this.form.work!="" && typeof(this.form.name)=='string' && 
-		isNaN(this.form.name) && typeof(Number(this.form.deskpos))=='number')){
+        
           let newEmployee={
             empId:this.form.empId,
             name:this.form.name.toUpperCase(),
@@ -302,19 +307,27 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
           };this.errVal=false;
 
           console.log(newEmployee);
-          axios.post(`${BASE_URL}/api/insert`,newEmployee)
-          .then(res=>{
-            console.log(res);
-            this.getEmployee();
-          })
-          .catch(err=>{
-            console.log(err);
-          })
+		if(this.form.formerEmployee.length==0){
+		axios.post(`${BASE_URL}/api/insert`,newEmployee)
+		.then(res=>{
+		
+		if(res.status==202){
+		this.errVal=true;
+		this.allerr=res.data;
+		}
+		else{
+		console.log(res.data);
+		this.getEmployee();
+		}
+		})
+		.catch(err=>{
+		this.errVal=true;
+		this.allerr=err;
+		console.log(err);
+		})
+		}
 
-        }
-        else{
-          this.errVal=true;
-        }
+        
 		
 		this.showModal();
       },
@@ -334,6 +347,7 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
         // Trick to reset/clear native browser form validation state
         this.show = false
         this.errVal=false
+		this.allerr={}
         this.$nextTick(() => {
           this.show = true
         })

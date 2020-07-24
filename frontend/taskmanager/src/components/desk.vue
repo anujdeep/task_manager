@@ -56,7 +56,7 @@ const BASE_URL = process.env.VUE_APP_BASE_URL
     created (){
         bus.$on('changeIt', (data) => {
           this.employee_list = data;
-          //console.log(this.employee_list)
+          
         })
       }
 

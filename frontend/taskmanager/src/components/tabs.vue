@@ -7,7 +7,6 @@
             <b-tab title="Employee Status" active><slot>
             <window /><br><br><hr><a id = "GFG" href="#li1"><p id="stat">Status of Employee</p></a>
             <list id="li1" />
-            <button @click="topFunction()" id="myBtn" title="Go to top">Top</button>
             </slot></b-tab>
             <b-tab title="Record"><slot><record/></slot></b-tab>
             <b-tab title="Desk Position" ><slot>
@@ -32,29 +31,8 @@ import record from './table.vue'
           record
 
         },
-        methods:{
-           topFunction() {
-              document.body.scrollTop = 0
-              document.documentElement.scrollTop = 0
-          },
-          // updList(){
-          //   this.val=true
-          // }
-        },
-        created(){
-                var mybutton = document.getElementById("myBtn");
-
-            // When the user scrolls down 20px from the top of the document, show the button
-            window.onscroll = function() {scrollFunction()};
-
-            function scrollFunction() {
-              if (document.body.scrollTop > 5 || document.documentElement.scrollTop > 5) {
-                mybutton.style.display = "block";
-              } else {
-                mybutton.style.display = "none";
-              }
-            }
-        },
+        
+        
 
     }
 
